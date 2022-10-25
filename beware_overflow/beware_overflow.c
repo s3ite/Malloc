@@ -2,5 +2,11 @@
 
 void *beware_overflow(void *ptr, size_t nmemb, size_t size)
 {
-    return __builtin_umull_overflow(nmemb, size, ptr) ? NULL : ptr;
+    size_t offset = nmemb * size;
+    if (__builtin_umull_overflow(nmemb, size, &offset))
+        return NULL;
+
+    char *ptr2 = ptr;
+
+    return ptr2 + offset;
 }
