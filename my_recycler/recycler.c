@@ -4,8 +4,8 @@
 
 struct recycler *recycler_create(size_t block_size, size_t total_size)
 {
-    if (block_size == 0 || total_size == 0
-        || block_size % (sizeof(size_t)) != 0)
+    if (block_size == 0 || total_size == 0 || block_size % (sizeof(size_t)) != 0
+        || total_size % block_size != 0)
         return NULL;
 
     struct recycler *newrecycler = malloc(sizeof(struct recycler));
@@ -53,9 +53,13 @@ void *recycler_allocate(struct recycler *r)
         return NULL;
 
     struct free_list *list = r->free;
+
     struct free_list *head = list;
     list = list->next;
     head->next = NULL;
+
+    r->free = list;
+
     return head;
 }
 
