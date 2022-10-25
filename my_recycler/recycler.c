@@ -1,5 +1,7 @@
 #include "recycler.h"
 
+#include <stdlib.h>
+
 struct recycler *recycler_create(size_t block_size, size_t total_size)
 {
     if (block_size == 0 || total_size == 0
