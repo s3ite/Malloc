@@ -2,8 +2,8 @@
 
 void *page_begin(void *ptr, size_t page_size)
 {
-	char *tmp = NULL;
+    char *tmp = NULL;
 
-	size_t page_begin = (size_t) ptr & (~(page_size - 1));
-	return tmp+page_begin;
+    size_t page_begin = (size_t)ptr & (~(page_size - 1));
+    return tmp + page_begin;
 }
