@@ -29,14 +29,14 @@ size_t align(size_t size)
 
 struct blk_meta *blka_alloc(struct blk_allocator *blka, size_t size)
 {
-    size_t sizealign = align(size + sizeof(struct blk_allocator));
+    size_t sizealign = align(size);
 
     struct blk_meta *meta = mmap(NULL, sizealign, PROT_READ | PROT_WRITE,
                                  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (meta == MAP_FAILED)
         return NULL;
 
-    meta->size = sizealign - sizeof(struct blk_allocator);
+    meta->size = sizealign - sizeof(struct blk_meta);
     meta->next = blka->meta;
     blka->meta = meta;
 
@@ -45,7 +45,7 @@ struct blk_meta *blka_alloc(struct blk_allocator *blka, size_t size)
 
 void blka_free(struct blk_meta *blk)
 {
-    munmap(blk->data, blk->size);
+    munmap(blk->data, blk->size + sizeof(struct blk_meta));
 }
 
 void blka_pop(struct blk_allocator *blka)
