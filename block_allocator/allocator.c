@@ -14,6 +14,9 @@ struct blk_allocator *blka_new(void)
 
 size_t align(size_t size)
 {
+    if (size == 0)
+        return sysconf(_SC_PAGESIZE);
+
     if (size % sysconf(_SC_PAGESIZE) == 0)
         return size;
 
@@ -29,14 +32,14 @@ size_t align(size_t size)
 
 struct blk_meta *blka_alloc(struct blk_allocator *blka, size_t size)
 {
-    size_t sizealign = align(size);
+    size_t sizealign = align(size + sizeof(struct blk_allocator));
 
     struct blk_meta *meta = mmap(NULL, sizealign, PROT_READ | PROT_WRITE,
                                  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (meta == MAP_FAILED)
         return NULL;
 
-    meta->size = sizealign - sizeof(struct blk_meta);
+    meta->size = sizealign - sizeof(struct blk_allocator);
     meta->next = blka->meta;
     blka->meta = meta;
 
@@ -50,6 +53,9 @@ void blka_free(struct blk_meta *blk)
 
 void blka_pop(struct blk_allocator *blka)
 {
+    if (!blka || !blka->meta)
+        return;
+
     struct blk_meta *head = blka->meta;
     blka->meta = head->next;
     head->next = NULL;
@@ -59,8 +65,8 @@ void blka_pop(struct blk_allocator *blka)
 
 void blka_delete(struct blk_allocator *blka)
 {
-	if (!blka)
-		return;
+    if (!blka)
+        return;
 
     struct blk_meta *head = blka->meta;
 
