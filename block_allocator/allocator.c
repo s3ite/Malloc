@@ -1,60 +1,72 @@
 #include "allocator.h"
+
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
 struct blk_allocator *blka_new(void)
 {
-	struct blk_alloccator *blka = malloc(sizeof(struct blk_allocator));
-	struct blk_meta *meta = malloc(sizeof(struct blk_meta));
+    struct blk_allocator *blka = malloc(sizeof(struct blk_allocator));
+    blka->meta = NULL;
 
-	meta->next = NULL;
-	meta->data = NULL;
-	meta->size = 0;
+    return blka;
+}
 
-	blka->meta = meta;
+size_t align(size_t size)
+{
+    if (size % sysconf(_SC_PAGESIZE) == 0)
+        return size;
 
-	return blka;
+    size_t addition;
+
+    if (__builtin_add_overflow(size, sysconf(_SC_PAGESIZE), &addition))
+        return 0;
+
+    addition -= size % sysconf(_SC_PAGESIZE);
+
+    return addition;
 }
 
 struct blk_meta *blka_alloc(struct blk_allocator *blka, size_t size)
 {
-	void *addr = mmap(NULL, size,  PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	if (addr == MAP_FAILED)
-		return NULL;
+    size_t sizealign = align(size + sizeof(struct blk_allocator));
 
-	struct blk_meta *meta = blka->meta;
-	meta->data = addr;
-	meta->size = size - sizeof(struct blk_meta);
-	meta->next = NULL;
+    struct blk_meta *meta = mmap(NULL, sizealign, PROT_READ | PROT_WRITE,
+                                 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (meta == MAP_FAILED)
+        return NULL;
 
-	return meta;
+    meta->size = size;
+    meta->next = blka->meta;
+    blka->meta = meta;
+
+    return meta;
 }
 
 void blka_free(struct blk_meta *blk)
 {
-	munmap(blk->data, blk->size);
-
+    munmap(blk->data, blk->size);
 }
 
 void blka_pop(struct blk_allocator *blka)
 {
-	struct blk_meta *head = blka->meta;
-	blka->meta = head->next;
-	head->next = NULL;
+    struct blk_meta *head = blka->meta;
+    blka->meta = head->next;
+    head->next = NULL;
 
-	blka_free(head);
+    blka_free(head);
 }
 
 void blka_delete(struct blk_allocator *blka)
 {
-	struct blk_meta *head = blka->meta;
+    struct blk_meta *head = blka->meta;
 
-	for(; blka->meta;)
-	{
-		head = blka->meta;
-		blka->meta = blka->meta->next;
-		free(head);
-	}
+    for (; blka->meta;)
+    {
+        head = blka->meta;
+        blka->meta = blka->meta->next;
+        blka_free(head);
+    }
 
-	free(blka);
+    free(blka);
 }
