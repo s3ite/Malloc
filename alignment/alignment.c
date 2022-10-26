@@ -7,10 +7,10 @@ size_t align(size_t size)
 
     size_t addition;
 
-    if (_builtin_add_overflow(size, sizeof(long double), &addition))
+    if (__builtin_add_overflow(size, sizeof(long double), &addition))
         return 0;
 
     addition -= size % sizeof(long double);
 
-    return addidtion;
+    return addition;
 }
