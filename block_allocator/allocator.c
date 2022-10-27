@@ -39,7 +39,7 @@ struct blk_meta *blka_alloc(struct blk_allocator *blka, size_t size)
     if (meta == MAP_FAILED)
         return NULL;
 
-    meta->size = sizealign - sizeof(struct blk_allocator);
+    meta->size = sizealign - sizeof(struct blk_meta);
     meta->next = blka->meta;
     blka->meta = meta;
 
