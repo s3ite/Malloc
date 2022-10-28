@@ -22,6 +22,6 @@ int main(int argc, char const *argv[])
     int val1 = atoi(argv[1]);
     int val2 = atoi(argv[2]);
 
-    testcalloc1(val1, val2);
+    testmalloc1(val1, val2);
     (void) argc;
 }

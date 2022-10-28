@@ -30,13 +30,14 @@ void *first_fit(struct blk_meta *meta, size_t size)
         {
             size = align_long_double(size + sizeof(struct blk_meta));
             // Set next bloc
-            struct blk_meta *next = head + size;
+            void *tmp = head;
+            struct blk_meta *next = (struct blk_meta*)((size_t)tmp + size);
 
-            /*
+            
             next->size = head->size - size;
             next->prev = head;
             next->status = -1;
-            */
+            
             head->status = 1;
             head->next = next;
             head->size = size - sizeof(struct blk_meta);
