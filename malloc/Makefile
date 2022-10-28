@@ -5,7 +5,7 @@ LDFLAGS = -shared
 VPATH = src
 
 TARGET_LIB = libmalloc.so
-OBJS = malloc.o
+OBJS = malloc.o allocator.o interface.o
 
 all: library
 
@@ -14,6 +14,9 @@ $(TARGET_LIB): CFLAGS += -pedantic -fvisibility=hidden
 $(TARGET_LIB): LDFLAGS += -Wl,--no-undefined
 $(TARGET_LIB): $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^
+
+check:
+	./tests/test
 
 debug: CFLAGS += -g
 debug: clean $(TARGET_LIB)
