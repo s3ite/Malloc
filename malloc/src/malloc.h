@@ -35,7 +35,6 @@ __attribute__((visibility("default"))) void *calloc(size_t nmemb, size_t size);
 __attribute__((visibility("default"))) void *my_malloc(size_t size);
 __attribute__((visibility("default"))) void my_free(void *ptr);
 __attribute__((visibility("default"))) void *my_realloc(void *ptr, size_t size);
-__attribute__((visibility("default"))) void *my_calloc(size_t nmemb,
-                                                       size_t size);
+__attribute__((visibility("default"))) void *my_calloc(size_t nmemb, size_t size);
 
 #endif /* MALLOC_H */

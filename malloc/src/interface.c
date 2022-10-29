@@ -28,7 +28,7 @@ struct blk_meta *block(struct blk_meta *head, size_t size, int next)
     else
         tmp -= size;
 
-    return (struct blk_meta *) tmp;
+    return (struct blk_meta *)tmp;
 }
 
 struct blk_meta *get_next(struct blk_meta *head, size_t size)
@@ -100,7 +100,7 @@ __attribute__((visibility("default"))) void my_free(void *ptr)
 {
     if (!ptr)
         return;
-    
+
     struct blk_meta *head = ptr;
     head = block(head, sizeof(struct blk_meta), -1);
 
@@ -130,7 +130,7 @@ __attribute__((visibility("default"))) void *my_realloc(void *ptr, size_t size)
 
     struct blk_meta *head = ptr;
     head = block(head, sizeof(struct blk_meta), -1);
-    
+
     char *data = my_malloc(size);
 
     copy_data(head->data, data, size);

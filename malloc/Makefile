@@ -17,12 +17,13 @@ $(TARGET_LIB): $(OBJS) $(MALLOC)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 check:
-	./tests/test
+	$(CC) $(CFLAGS) $(OBJS) $(MALLOC) ./tests/tests.c -o test
+	./test
 
 debug: CFLAGS += -g
 debug: clean $(TARGET_LIB)
 
 clean:
-	$(RM) $(TARGET_LIB) $(OBJS)
+	$(RM) $(TARGET_LIB) $(OBJS) $(MALLOC)
 
 .PHONY: all $(TARGET_LIB) clean
