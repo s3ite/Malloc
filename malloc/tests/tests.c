@@ -25,11 +25,11 @@ void testmalloc1(int val1, int val2)
     printf("%ld\n", diff);
 }
 
-void *testmalloc2(int val1)
+void *testmalloc2(int val1, char c)
 {
     char *array = my_malloc(val1);
     for (int i = 0; i < val1; i++)
-        array[i] = '$';
+        array[i] = c;
 
     for (int i = 0; i < 20; i++)
         printf("%p : [%c]\n", array + i, array[i]);
@@ -107,17 +107,35 @@ void *testrealloc1(int val1, int val2)
 int main(int argc, char const *argv[])
 {
     int val1 = atoi(argv[1]);
-    // int val2 = atoi(argv[2]);
+    int val2 = atoi(argv[2]);
 
-    testmalloc2(val1);
+    void *t1 = testmalloc2(val1, '#');
+    void *t2 = testmalloc2(val1, '%');
+    my_free(t1);
+    
+    char *t3 = my_realloc(t2, val1);
+    char *t4 = my_calloc(val1-1, 1);
 
+    for (int i = 0; i < val1; i++)
+        printf("%p : [%c]\n", t3+i, t3[i]);
+
+    for (int i = 0; i < val1; i++)
+        printf("%p : [%c]\n", t4+i, t4[i]);
+
+/*
     void *init = my_malloc(val1);
+    printf("%p\n", init);
+
     my_free(init);
+    //void *fin = my_malloc(val1);
+    //printf("%p\n", fin);
 
-    testcalloc2(val1, 1);
+    char *array = my_calloc(val1-1, 1);
+    printf("%p\n", array);
 
-    // my_malloc(val2);
-
+    for (int i = 0; i < 20; i++)
+        printf("%p : [%d]\n", array + i, array[i]);
+*/
     (void)argv;
     (void)argc;
 }

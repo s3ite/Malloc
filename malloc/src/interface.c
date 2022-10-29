@@ -19,9 +19,21 @@ size_t align_long_double(size_t size)
     return addition;
 }
 
+struct blk_meta *block(struct blk_meta *head, size_t size, int next)
+{
+    size_t tmp = (size_t)head;
+
+    if (next == 1)
+        tmp += size;
+    else
+        tmp -= size;
+
+    return (struct blk_meta *) tmp;
+}
+
 struct blk_meta *get_next(struct blk_meta *head, size_t size)
 {
-    struct blk_meta *next = (struct blk_meta *)((size_t)head + size);
+    struct blk_meta *next = block(head, size, 1);
     next->size = head->size - size;
     next->prev = head;
     next->next = head->next;
@@ -36,7 +48,7 @@ void *first_fit(size_t size)
     struct blk_meta *tmpptr = meta;
     struct blk_meta *next = NULL;
 
-    size = align_long_double(size + sizeof(struct blk_meta));
+    size_t sizealign = align_long_double(size + sizeof(struct blk_meta));
 
     for (; head != NULL; head = head->next)
     {
@@ -44,11 +56,11 @@ void *first_fit(size_t size)
         if (head->status == -1 && size < head->size)
         {
             // Set next bloc
-            next = get_next(head, size);
+            next = get_next(head, sizealign);
 
             head->status = 1;
             head->next = next;
-            head->size = size - sizeof(struct blk_meta);
+            head->size = sizealign - sizeof(struct blk_meta);
             return head->data;
         }
 
@@ -56,18 +68,17 @@ void *first_fit(size_t size)
     }
 
     // if no bloc is suitable we allocate a new block;
-    head = blka_alloc(size);
+    head = blka_alloc(sizealign);
     if (!head)
         return NULL;
 
-    size = align_long_double(size);
-    next = get_next(head, size);
+    next = get_next(head, sizealign);
 
     tmpptr->next = head;
 
     head->next = NULL;
     head->prev = tmpptr;
-    head->size = size - sizeof(struct blk_meta);
+    head->size = size;
     head->status = 1;
 
     return head->data;
@@ -89,19 +100,21 @@ __attribute__((visibility("default"))) void my_free(void *ptr)
 {
     if (!ptr)
         return;
-
+    
     struct blk_meta *head = ptr;
+    head = block(head, sizeof(struct blk_meta), -1);
+
     head->status = -1;
 
     // free page if nothing inside except the bloc ptr
-    if (head->next == NULL)
+    if (!head->next || (head->next->status == -1 && !head->next->next))
         blka_free(head);
 }
 
-void copy_data(struct blk_meta *base, struct blk_meta *dest, size_t size)
+void copy_data(char *base, char *dest, size_t size)
 {
     for (size_t i = 0; i < size; ++i)
-        dest->data[i] = base->data[i];
+        dest[i] = base[i];
 }
 
 __attribute__((visibility("default"))) void *my_realloc(void *ptr, size_t size)
@@ -115,23 +128,15 @@ __attribute__((visibility("default"))) void *my_realloc(void *ptr, size_t size)
         return ptr;
     }
 
-    struct blk_meta *head = meta;
-    size = align_long_double(size + sizeof(struct blk_meta));
+    struct blk_meta *head = ptr;
+    head = block(head, sizeof(struct blk_meta), -1);
+    
+    char *data = my_malloc(size);
 
-    for (; head != NULL; head = head->next)
-    {
-        // if free block
-        if (head->status == -1 && size < head->size)
-        {
-            copy_data(ptr, head, size);
-            my_free(ptr);
-        }
-    }
+    copy_data(head->data, data, size);
+    my_free(ptr);
 
-    (void)ptr;
-    (void)size;
-
-    return NULL;
+    return data;
 }
 
 __attribute__((visibility("default"))) void *my_calloc(size_t nmemb,
