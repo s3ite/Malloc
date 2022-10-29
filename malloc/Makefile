@@ -1,18 +1,19 @@
 CC = gcc
 CPPFLAGS = -D_DEFAULT_SOURCE
-CFLAGS = -Wall -Wextra -Werror -std=c99 -fPIC -fno-builtin -Wvla
+CFLAGS = -Wall -Wextra -Werror -std=c99 -fPIC -fno-builtin -Wvla -g
 LDFLAGS = -shared
 VPATH = src
 
 TARGET_LIB = libmalloc.so
-OBJS = malloc.o allocator.o interface.o
+OBJS = allocator.o interface.o
+MALLOC = malloc.o
 
 all: library
 
 library: $(TARGET_LIB)
 $(TARGET_LIB): CFLAGS += -pedantic -fvisibility=hidden
 $(TARGET_LIB): LDFLAGS += -Wl,--no-undefined
-$(TARGET_LIB): $(OBJS)
+$(TARGET_LIB): $(OBJS) $(MALLOC)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 check:

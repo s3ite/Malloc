@@ -3,25 +3,121 @@
 void testmalloc1(int val1, int val2)
 {
     char *array = my_malloc(val1);
+    char *array2 = my_malloc(val1);
+    char *array3 = my_malloc(val1);
 
     for (int i = 0; i < val2; i++)
-        printf("%p : [%d]\n", array + i, array[i]); 
+        printf("%p : [%d]\n", array + i, array[i]);
+
+    printf("\n%s\n\n", "================");
+
+    for (int i = 0; i < val2; i++)
+        printf("%p : [%d]\n", array2 + i, array2[i]);
+
+    printf("\n%s\n\n", "================");
+
+    for (int i = 0; i < val2; i++)
+        printf("%p : [%d]\n", array3 + i, array3[i]);
+
+    printf("\n%s\n\n", "================");
+
+    size_t diff = (size_t)array3 - (size_t)array;
+    printf("%ld\n", diff);
 }
 
+void *testmalloc2(int val1)
+{
+    char *array = my_malloc(val1);
+    for (int i = 0; i < val1; i++)
+        array[i] = '$';
+
+    for (int i = 0; i < 20; i++)
+        printf("%p : [%c]\n", array + i, array[i]);
+
+    printf("\n%s\n\n", "================");
+
+    return array;
+}
+
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 void testcalloc1(int val1, int val2)
 {
-    char *array2 = my_calloc(val1, 2);
+    char *array = my_calloc(val1, val2);
+    char *array2 = my_calloc(val1, val2);
+    char *array3 = my_calloc(val1, val2);
 
     for (int i = 0; i < val2; i++)
-        printf("%p : [%d]\n", array2 + i, array2[i]); 
+        printf("%p : [%d]\n", array + i, array[i]);
+
+    printf("\n%s\n\n", "================");
+
+    for (int i = 0; i < val2; i++)
+        printf("%p : [%d]\n", array2 + i, array2[i]);
+
+    printf("\n%s\n\n", "================");
+
+    for (int i = 0; i < val2; i++)
+        printf("%p : [%d]\n", array3 + i, array3[i]);
+
+    printf("\n%s\n\n", "================");
+
+    size_t diff = (size_t)array3 - (size_t)array;
+    printf("%ld\n", diff);
 }
 
+void *testcalloc2(int val1, int val2)
+{
+    char *array = my_calloc(val1, val2);
+
+    for (int i = 0; i < 20; i++)
+        printf("%p : [%c]\n", array + i, array[i]);
+
+    printf("\n%s\n\n", "================");
+
+    return array;
+}
+
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+void *testrealloc1(int val1, int val2)
+{
+    char *array = my_calloc(val1, val2);
+    char *array2 = my_calloc(val1, val2);
+    char *array3 = my_calloc(val1, val2);
+
+    for (int i = 0; i < val2; i++)
+        printf("%p : [%d]\n", array + i, array[i]);
+
+    printf("\n%s\n\n", "================");
+
+    for (int i = 0; i < val2; i++)
+        printf("%p : [%d]\n", array2 + i, array2[i]);
+
+    printf("\n%s\n\n", "================");
+
+    for (int i = 0; i < val2; i++)
+        printf("%p : [%d]\n", array3 + i, array3[i]);
+
+    printf("\n%s\n\n", "================");
+
+    size_t diff = (size_t)array3 - (size_t)array;
+    printf("%ld\n", diff);
+}
+//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
 int main(int argc, char const *argv[])
 {
     int val1 = atoi(argv[1]);
-    int val2 = atoi(argv[2]);
+    // int val2 = atoi(argv[2]);
 
-    testmalloc1(val1, val2);
-    (void) argc;
+    testmalloc2(val1);
+
+    void *init = my_malloc(val1);
+    my_free(init);
+
+    testcalloc2(val1, 1);
+
+    // my_malloc(val2);
+
+    (void)argv;
+    (void)argc;
 }

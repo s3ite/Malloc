@@ -1,5 +1,5 @@
-#ifndef MALLOC
-#define MALLOC
+#ifndef MALLOC_H
+#define MALLOC_H
 
 #include <stddef.h>
 #include <stdio.h>
@@ -12,6 +12,7 @@ struct blk_meta
 {
     struct blk_meta *next;
     struct blk_meta *prev;
+
     // -1 == free && 1 == busy
     int status;
     size_t size;
@@ -37,4 +38,4 @@ __attribute__((visibility("default"))) void *my_realloc(void *ptr, size_t size);
 __attribute__((visibility("default"))) void *my_calloc(size_t nmemb,
                                                        size_t size);
 
-#endif
+#endif /* MALLOC_H */
